@@ -1,14 +1,31 @@
 "use client"
 
 import Link from "next/link"
+import { useState } from "react"
 import { Navbar } from "@/components/navbar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useLanguage } from "@/lib/language-context"
+import { supabase } from "@/lib/supabase-browser"
 
 export default function SignInPage() {
   const { t, language } = useLanguage()
+  const [email, setEmail] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState<string | null>(null)
+
+  async function handleSignIn(e: React.FormEvent) {
+    e.preventDefault()
+    setLoading(true)
+    setMessage(null)
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/` },
+    })
+    setLoading(false)
+  setMessage(error ? `Error: ${error.message}` : (language === "en" ? "Check your email for the sign-in link." : "请检查邮箱中的登录链接。"))
+  }
 
   return (
     <main className="min-h-screen bg-background">
@@ -25,17 +42,21 @@ export default function SignInPage() {
           </div>
 
           <div className="rounded-xl border border-border bg-card p-8">
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleSignIn}>
               <div className="space-y-2">
                 <Label htmlFor="email">{t.signIn.email}</Label>
                 <Input
                   id="email"
                   type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   placeholder={t.signIn.emailPlaceholder}
                   autoComplete="email"
+                  required
                 />
               </div>
 
+              {/* Password field retained visually, not used by magic link */}
               <div className="space-y-2">
                 <Label htmlFor="password">{t.signIn.password}</Label>
                 <Input
@@ -43,13 +64,21 @@ export default function SignInPage() {
                   type="password"
                   placeholder={language === "en" ? "Enter your password" : "输入密码"}
                   autoComplete="current-password"
+                  disabled
                 />
+                <p className="text-xs text-muted-foreground">
+                  {language === "en" ? "Password is disabled; we use magic links." : "当前使用魔术链接登录。"}
+                </p>
               </div>
 
-              <Button type="submit" className="w-full">
-                {t.signIn.button}
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? (language === "en" ? "Sending..." : "发送中...") : (t.signIn.button || (language === "en" ? "Send magic link" : "发送魔术链接"))}
               </Button>
             </form>
+
+            {message && (
+              <p className="mt-4 text-center text-sm text-muted-foreground">{message}</p>
+            )}
 
             <div className="mt-6 text-center text-sm text-muted-foreground">
               {t.signIn.noAccount}{" "}
@@ -60,10 +89,9 @@ export default function SignInPage() {
           </div>
 
           <p className="text-center text-xs text-muted-foreground">
-            {language === "en" 
+            {language === "en"
               ? "By signing in, you agree to our Terms of Service and Privacy Policy."
-              : "登录即表示您同意我们的服务条款和隐私政策。"
-            }
+              : "登录即表示您同意我们的服务条款和隐私政策。"}
           </p>
         </div>
       </section>
