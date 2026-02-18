@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { UserNav } from "@/components/user-nav"
 import { useLanguage } from "@/lib/language-context"
 import { Languages } from "lucide-react"
 
@@ -46,9 +47,7 @@ export function Navbar() {
             <Languages className="h-4 w-4" />
             <span className="hidden sm:inline">{language === "en" ? "中文" : "EN"}</span>
           </Button>
-          <Button variant="ghost" size="sm" asChild>
-            <Link href="/signin">{t.nav.signIn}</Link>
-          </Button>
+          <UserNav />
         </div>
       </div>
     </header>

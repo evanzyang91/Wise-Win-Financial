@@ -25,3 +25,9 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# docs
+AUTH_IMPLEMENTATION.md 
+CHECKLIST.md 
+SETUP_COMPLETE.md 
+SUPABASE_AUTH_SETUP.md 
