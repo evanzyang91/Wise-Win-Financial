@@ -3,11 +3,15 @@
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { User, Session, AuthError } from '@supabase/supabase-js'
 import { supabase } from './supabase-browser'
+import { getUserRole, isAdmin, isSuperAdmin, UserRole } from './roles'
 
 interface AuthContextType {
   user: User | null
   session: Session | null
   loading: boolean
+  role: UserRole | null
+  isAdmin: boolean
+  isSuperAdmin: boolean
   signInWithGoogle: () => Promise<{ error: AuthError | null }>
   signInWithEmail: (email: string) => Promise<{ error: AuthError | null }>
   signOut: () => Promise<{ error: AuthError | null }>
@@ -19,12 +23,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [session, setSession] = useState<Session | null>(null)
   const [loading, setLoading] = useState(true)
+  const [role, setRole] = useState<UserRole | null>(null)
 
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session)
       setUser(session?.user ?? null)
+      setRole(session?.user ? getUserRole(session.user) : null)
       setLoading(false)
     })
 
@@ -34,6 +40,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session)
       setUser(session?.user ?? null)
+      setRole(session?.user ? getUserRole(session.user) : null)
       setLoading(false)
     })
 
@@ -73,6 +80,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     session,
     loading,
+    role,
+    isAdmin: isAdmin(role ?? undefined),
+    isSuperAdmin: isSuperAdmin(role ?? undefined),
     signInWithGoogle,
     signInWithEmail,
     signOut,

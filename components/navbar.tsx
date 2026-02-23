@@ -4,10 +4,12 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { UserNav } from "@/components/user-nav"
 import { useLanguage } from "@/lib/language-context"
-import { Languages } from "lucide-react"
+import { useAuth } from "@/lib/auth-context"
+import { Languages, Shield } from "lucide-react"
 
 export function Navbar() {
   const { language, setLanguage, t } = useLanguage()
+  const { isAdmin } = useAuth()
 
   const toggleLanguage = () => {
     setLanguage(language === "en" ? "zh" : "en")
@@ -35,6 +37,15 @@ export function Navbar() {
           >
             {t.nav.explorePricing}
           </Link>
+          {isAdmin && (
+            <Link
+              href="/admin"
+              className="flex items-center gap-1.5 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+            >
+              <Shield className="h-4 w-4" />
+              {language === "en" ? "Admin" : "管理"}
+            </Link>
+          )}
         </nav>
 
         <div className="flex items-center gap-2">
