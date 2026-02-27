@@ -5,16 +5,28 @@ import type { NextRequest } from 'next/server'
 export async function GET(request: NextRequest) {
   const requestUrl = new URL(request.url)
   const code = requestUrl.searchParams.get('code')
+  const next = requestUrl.searchParams.get('next') || '/'
 
   if (code) {
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!,
+      {
+        auth: {
+          flowType: 'pkce'
+        }
+      }
     )
     
-    await supabase.auth.exchangeCodeForSession(code)
+    const { error } = await supabase.auth.exchangeCodeForSession(code)
+    
+    if (!error) {
+      // Successfully exchanged code for session
+      // Redirect to the origin that initiated the request
+      return NextResponse.redirect(new URL(next, requestUrl.origin))
+    }
   }
 
-  // URL to redirect to after sign in process completes
-  return NextResponse.redirect(new URL('/', requestUrl.origin))
+  // If no code or error, redirect to sign in page on the same origin
+  return NextResponse.redirect(new URL('/signin', requestUrl.origin))
 }

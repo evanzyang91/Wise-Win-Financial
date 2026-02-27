@@ -48,10 +48,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   const signInWithGoogle = async () => {
+    // Use window.location.origin to get the current domain (works for both vercel and custom domain)
+    const redirectUrl = typeof window !== 'undefined' 
+      ? `${window.location.origin}/auth/callback`
+      : `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`
+    
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+        redirectTo: redirectUrl,
         queryParams: {
           access_type: 'offline',
           prompt: 'consent',
@@ -62,10 +67,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const signInWithEmail = async (email: string) => {
+    // Use window.location.origin to get the current domain
+    const redirectUrl = typeof window !== 'undefined'
+      ? `${window.location.origin}/auth/callback`
+      : `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`
+    
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`,
+        emailRedirectTo: redirectUrl,
       },
     })
     return { error }
