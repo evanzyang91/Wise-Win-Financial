@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { UserNav } from "@/components/user-nav"
 import { useLanguage } from "@/lib/language-context"
@@ -16,12 +17,16 @@ export function Navbar() {
   }
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-xl font-semibold tracking-tight text-foreground">
-            {language === "en" ? "慧盈财富" : "Wise Win"}
-          </span>
+    <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-16 items-center justify-between">
+        <Link href="/" className="flex items-center space-x-2 ml-4">
+          <Image
+            src="/logo.png"
+            alt="Wise Win Financial"
+            width={200}
+            height={200}
+            className="h-14 w-auto"
+          />
         </Link>
 
         <nav className="hidden items-center gap-8 md:flex">
