@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import { User, Session, AuthError } from '@supabase/supabase-js'
 import { supabase } from './supabase-browser'
 import { getUserRole, isAdmin, isSuperAdmin, UserRole } from './roles'
+import { sign } from 'crypto'
 
 interface AuthContextType {
   user: User | null
@@ -13,7 +14,10 @@ interface AuthContextType {
   isAdmin: boolean
   isSuperAdmin: boolean
   signInWithGoogle: () => Promise<{ error: AuthError | null }>
-  signInWithEmail: (email: string) => Promise<{ error: AuthError | null }>
+  signInWithEmail: (email: string, password: string) => Promise<{ error: AuthError | null }>
+  signUpWithEmail: (email: string, password: string) => Promise<{ error: AuthError | null }>
+  resetPassword: (email: string) => Promise<{ error: AuthError | null }>
+  updatePassword: (newPassword: string) => Promise<{ error: AuthError | null }>
   signOut: () => Promise<{ error: AuthError | null }>
 }
 
@@ -66,17 +70,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { error }
   }
 
-  const signInWithEmail = async (email: string) => {
-    // Use window.location.origin to get the current domain
+  const signInWithEmail = async (email: string, password: string) => {
+    
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    })
+
+    return { error }
+  }
+
+  const signUpWithEmail = async (email: string, password: string) => {
     const redirectUrl = typeof window !== 'undefined'
       ? `${window.location.origin}/auth/callback`
       : `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback`
-    
-    const { error } = await supabase.auth.signInWithOtp({
+
+    const { error } = await supabase.auth.signUp({
       email,
+      password,
       options: {
         emailRedirectTo: redirectUrl,
       },
+    })
+    return { error }
+  }
+
+  const resetPassword = async (email: string) => {
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/reset-password`
+    })
+    return { error }
+  }
+
+  const updatePassword = async (newPassword: string) => {
+    const { error } = await supabase.auth.updateUser({
+      password: newPassword,
     })
     return { error }
   }
@@ -95,6 +123,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     isSuperAdmin: isSuperAdmin(role ?? undefined),
     signInWithGoogle,
     signInWithEmail,
+    signUpWithEmail,
+    resetPassword,
+    updatePassword,
     signOut,
   }
 
