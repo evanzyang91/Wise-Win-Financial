@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Navbar } from "@/components/navbar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -12,7 +13,9 @@ import { useAuth } from "@/lib/auth-context"
 export default function SignInPage() {
   const { t, language } = useLanguage()
   const { signInWithGoogle, signInWithEmail } = useAuth()
+  const router = useRouter()
   const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
@@ -22,10 +25,15 @@ export default function SignInPage() {
     setLoading(true)
     setMessage(null)
     
-    const { error } = await signInWithEmail(email)
+    const { error } = await signInWithEmail(email, password)
     
     setLoading(false)
-    setMessage(error ? `Error: ${error.message}` : (language === "en" ? "Check your email for the sign-in link." : "请检查邮箱中的登录链接。"))
+    
+    if (error) {
+      setMessage(`Error: ${error.message}`)
+    } else {
+      router.push("/")
+    }
   }
 
   async function handleGoogleSignIn() {
@@ -114,17 +122,26 @@ export default function SignInPage() {
 
               {/* Password field retained visually, not used by magic link */}
               <div className="space-y-2">
-                <Label htmlFor="password">{t.signIn.password}</Label>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="password">{t.signIn.password}</Label>
+                  <Link
+                    href="/forgot-password"
+                    className="text-sm text-primary hover:underline"
+                  >
+                    {language === "en" ? "Forgot password?" : "忘记密码？"}
+                  </Link>
+                </div>
+                
                 <Input
                   id="password"
                   type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   placeholder={language === "en" ? "Enter your password" : "输入密码"}
                   autoComplete="current-password"
-                  disabled
+                  required 
+                  disabled={loading}
                 />
-                <p className="text-xs text-muted-foreground">
-                  {language === "en" ? "Password is disabled; we use magic links." : "当前使用魔术链接登录。"}
-                </p>
               </div>
 
               <Button type="submit" className="w-full" disabled={loading}>

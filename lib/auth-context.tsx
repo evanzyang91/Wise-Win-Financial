@@ -4,7 +4,6 @@ import React, { createContext, useContext, useEffect, useState } from 'react'
 import { User, Session, AuthError } from '@supabase/supabase-js'
 import { supabase } from './supabase-browser'
 import { getUserRole, isAdmin, isSuperAdmin, UserRole } from './roles'
-import { sign } from 'crypto'
 
 interface AuthContextType {
   user: User | null
