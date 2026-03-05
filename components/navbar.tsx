@@ -18,8 +18,8 @@ export function Navbar() {
 
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center px-4">
-        <Link href="/" className="flex items-center">
+      <div className="container flex h-16 items-center justify-between px-4">
+        <Link href="/" className="flex items-center shrink-0">
           <Image
             src="/logo.png"
             alt="Wise Win Financial"
@@ -30,7 +30,7 @@ export function Navbar() {
           />
         </Link>
 
-        <nav className="hidden items-center gap-6 md:flex mx-auto">
+        <nav className="hidden items-center gap-6 md:flex absolute left-1/2 -translate-x-1/2">
           <Link
             href="/about"
             className="text-sm font-medium text-muted-foreground transition-colors hover:text-foreground"
@@ -54,7 +54,7 @@ export function Navbar() {
           )}
         </nav>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
           <Button
             variant="ghost"
             size="sm"
