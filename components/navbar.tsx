@@ -7,17 +7,45 @@ import { UserNav } from "@/components/user-nav"
 import { useLanguage } from "@/lib/language-context"
 import { useAuth } from "@/lib/auth-context"
 import { Languages, Shield } from "lucide-react"
+import { useState, useEffect } from "react"
 
 export function Navbar() {
   const { language, setLanguage, t } = useLanguage()
   const { isAdmin } = useAuth()
+
+  const [isVisible, setIsVisible] = useState(true)
+  const [lastScrollY, setLastScrollY] = useState(0)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+
+      if (currentScrollY > lastScrollY && currentScrollY > 100) {
+        setIsVisible(false)
+      } else {
+        setIsVisible(true)
+      }
+      setLastScrollY(currentScrollY)
+    }
+
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [lastScrollY])
 
   const toggleLanguage = () => {
     setLanguage(language === "en" ? "zh" : "en")
   }
 
   return (
-    <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header 
+      className={`
+        fixed top-0 z-50 w-full
+        border-b bg-background/95 backdrop-blur 
+        supports-[backdrop-filter]:bg-background/60
+        transition-transform duration-300 ease-in-out
+        ${isVisible ? 'translate-y-0' : '-translate-y-full'}
+      `}
+    >
       <div className="container flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center space-x-2 ml-4">
           <Image

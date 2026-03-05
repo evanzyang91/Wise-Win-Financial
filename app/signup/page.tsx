@@ -74,8 +74,8 @@ export default function SignUpPage() {
     return (
         <main className="min-h-screen bg-background">
             <Navbar />
-            <section className="flex min-h-screen items-center justify-center px-6 pt-16">
-                <div className="w-full max-w-md space-y-8">
+            <section className="flex min-h-screen items-center justify-center px-6 pt-22">
+                <div className="w-full max-w-md space-y-4">
                     {/* Header */}
                     <div className="text-center">
                         <h1 className="text-3xl font-light tracking-tight text-foreground">
