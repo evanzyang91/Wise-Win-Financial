@@ -18,7 +18,7 @@ export function Navbar() {
 
   return (
     <header className="border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between px-4">
+      <div className="container relative flex h-16 items-center justify-between px-4">
         <Link href="/" className="flex items-center shrink-0">
           <Image
             src="/logo.png"
